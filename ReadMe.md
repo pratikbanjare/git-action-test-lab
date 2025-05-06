@@ -4,6 +4,8 @@ This project is to test features of git actions and to build a complete CI/CD in
 
 ## Setup up git and docker on local
 
+Open terminal `cmd`
+Go to desired folder using `cd` command.
 
 ## Clone this repo on local using git 
 `git clone https://github.com/pratikbanjare/git-action-test-lab.git`
@@ -19,3 +21,13 @@ This project is to test features of git actions and to build a complete CI/CD in
 
 Replace `DOCKERUSERNAME` with your docker username.
 
+## Start application on docker and test the API 
+
+Trigger from terminal `docker compose up`
+This should start the application on VM. 
+The port highlighted below allows us to expose a port from container / VM
+
+![img.png](img.png)
+
+Open Browser and go to https://localhost:8080/hello . The response should be like below image 
+![img_1.png](img_1.png)
