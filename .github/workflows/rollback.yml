@@ -1,0 +1,46 @@
+name: CI/CD with Rollback
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Set up Docker
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v2
+
+    # Build and push Docker image
+    - name: Build and push Docker image
+      env:
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t myrepo/myapp:${IMAGE_TAG} .
+        docker tag myrepo/myapp:${IMAGE_TAG} myrepo/myapp:latest
+        docker push myrepo/myapp:${IMAGE_TAG}
+        docker push myrepo/myapp:latest
+
+    # Deploy the application
+    - name: Deploy application
+      env:
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        echo "${IMAGE_TAG}" > last_successful_tag.txt
+        # Add your deployment script here, e.g., kubectl apply or docker-compose up
+        # Simulating deployment failure for testing
+        if [ "$RANDOM" -gt 20000 ]; then exit 1; fi
+
+    # Rollback on failure
+    - name: Rollback on failure
+      if: failure()
+      run: |
+        PREV_IMAGE_TAG=$(cat last_successful_tag.txt)
+        echo "Rolling back to previous image: ${PREV_IMAGE_TAG}"
+        # Add your rollback script here, e.g., kubectl apply or docker-compose up with PREV_IMAGE_TAG
